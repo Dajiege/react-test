@@ -1,6 +1,11 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
+const wendu = {
+  s: "Sheshidu",
+  h: "Huashidu"
+}
+
 function FeiTeng(props){
   return (
     props.sheshidu >= 100 ? (
@@ -17,40 +22,59 @@ function sToH (num){
 function hToS (num){
   return (num - 32) / 1.8
 }
-class Calculator extends React.Component {
-  constructor(props) {
+function zhuanhuan (num, to){
+  const number = parseInt(num);
+  if(Number.isNaN(number)){
+    return ""
+  }
+  const output = to(number);
+  return (Math.round(output * 1000) / 1000).toString();
+}
+
+class InputWendu extends React.Component {
+  constructor(props){
     super(props);
-    this.state = {
-      sheshidu: "",
-      huashidu: ""
-    };
-    this.handleChanges = this.handleChanges.bind(this);
-    this.handleChangeh = this.handleChangeh.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
-  handleChanges(e) {
+  handleChange(e){
     const target = e.target;
-    const value = parseInt(target.value);
-    const hvalue = sToH(value);
-    this.setState({
-      sheshidu: value ? value : "",
-      huashidu: hvalue
-    })
-  }
-  handleChangeh(e) {
-    const target = e.target;
-    const value = parseInt(target.value);
-    const svalue = hToS(value);
-    this.setState({
-      huashidu: value ? value : "",
-      sheshidu: svalue
-    })
+    this.props.onChange(target.value, target.name);
   }
   render(){
     return (
       <div>
-        <input type="tel" value={this.state.sheshidu} onChange={this.handleChanges}/>
-        <input type="tel" value={this.state.huashidu} onChange={this.handleChangeh}/>
-        <FeiTeng sheshidu={this.state.sheshidu}/>
+        <h3>请输入{this.props.type === "Sheshidu" ? "摄氏度" : "华氏度"}</h3>
+        <input type="text" name={this.props.type} onChange={this.props.onChange} value={this.props.wen}/>
+      </div>
+    )
+  }
+}
+class Calculator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      wendu: wendu.s,
+      number: ""
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    const target = e.target;
+    this.setState({
+      wendu: target.name,
+      number: target.value
+    })
+  }
+  render(){
+    const statu = this.state.wendu;
+    const number = this.state.number;
+    const sheshidu = statu === wendu.s ? number : zhuanhuan(number, hToS);
+    const huashidu = statu === wendu.h ? number : zhuanhuan(number, sToH);
+    return (
+      <div>
+        <InputWendu type={wendu.s} onChange={this.handleChange} wen={sheshidu}/>
+        <InputWendu type={wendu.h} onChange={this.handleChange} wen={huashidu}/>
+        <FeiTeng sheshidu={parseInt(sheshidu)}/>
       </div>
 
     )

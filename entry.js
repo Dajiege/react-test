@@ -7,6 +7,8 @@ import demo06 from "./demo/demo06.js"
 import demo07 from "./demo/demo07.jsx"
 import demo08 from "./demo/demo08.jsx"
 import demo09 from "./demo/demo09.jsx"
+import demo10 from "./demo/demo10.jsx"
+import demo11 from "./demo/demo11.jsx"
 
 
 // demo01();
@@ -26,4 +28,8 @@ import demo09 from "./demo/demo09.jsx"
 
 //demo08();
 
-demo09();
+// demo09();
+
+// demo10();
+
+demo11();
