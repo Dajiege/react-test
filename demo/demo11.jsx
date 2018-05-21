@@ -38,11 +38,19 @@ const data = [
 class SearchBar extends React.Component {
   constructor(props) {
     super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSwitch = this.handleSwitch.bind(this);
+  }
+  handleChange(e){
+    this.props.changeKey(e.target.value)
+  }
+  handleSwitch(){
+    this.props.switchStock()
   }
   render() {
     return (<div>
-      <input type="text" placeholder="Search..."/><br/>
-      <label><input type="checkbox"/>Only show products in stock</label>
+      <input type="text" placeholder="Search..." onChange={this.handleChange}/><br/>
+      <label><input type="checkbox" checked={this.props.isShowStock} onChange={this.handleSwitch}/>Only show products in stock</label>
     </div>)
   }
 }
@@ -53,7 +61,7 @@ class ProductCategoryRow extends React.Component {
   }
   render() {
     return (<tr>
-      <td colSpan="2">{this.props.category}</td>
+      <th colSpan="2">{this.props.category}</th>
     </tr>)
   }
 }
@@ -66,7 +74,7 @@ class ProductRow extends React.Component {
       <td>
         {this.props.name}
       </td>
-      <td>
+      <td style={this.props.isStocked ? {} : {color: "#f00"}}>
         {this.props.price}
       </td>
     </tr>)
@@ -80,13 +88,18 @@ class ProductTable extends React.Component {
   render() {
     const row = [];
     const obj = {};
+    const showStock = this.props.showStock;
+    const keyword = this.props.keywords;
     data.forEach(function(item) {
       const category = item.category;
+      if(item.name.indexOf(keyword) === -1 || (showStock && !item.stocked)){
+        return;
+      }
       if (!obj[category]) {
         row.push(<ProductCategoryRow category={category} key={category}/>)
         obj[category] = 1
       }
-      row.push(<ProductRow price={item.price} name={item.name} key={item.name}/>)
+      row.push(<ProductRow price={item.price} isStocked={item.stocked} name={item.name} key={item.name}/>)
     })
     return (<table>
       <thead>
@@ -105,11 +118,27 @@ class ProductTable extends React.Component {
 class FilterableProductTable extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      keywords: "",
+      showStock: false
+    }
+    this.changeKey = this.changeKey.bind(this);
+    this.switchStock = this.switchStock.bind(this);
+  }
+  changeKey(keyword){
+    this.setState({
+      keywords: keyword
+    })
+  }
+  switchStock(){
+    this.setState(prevState => ({
+      showStock: !prevState.showStock
+    }))
   }
   render() {
     return (<div>
-      <SearchBar/>
-      <ProductTable/>
+      <SearchBar changeKey={this.changeKey} switchStock={this.switchStock} isShowStock={this.state.showStock}/>
+      <ProductTable keywords={this.state.keywords} showStock={this.state.showStock}/>
     </div>)
   }
 }
